@@ -3448,8 +3448,8 @@ struct jx9_fmt_info
   sxu8 base;     /* The base for radix conversion */
   int flags;    /* One or more of JX9_FMT_FLAG_ constants below */
   sxu8 type;     /* Conversion paradigm */
-  const char *charset; /* The character set for conversion */
-  const char *prefix;  /* Prefix on non-zero values in alt format */
+  char *charset; /* The character set for conversion */
+  char *prefix;  /* Prefix on non-zero values in alt format */
 };
 #ifndef JX9_OMIT_FLOATING_POINT
 /*
@@ -3692,7 +3692,7 @@ JX9_PRIVATE sxi32 jx9InputFormat(
 				zBuf = (char *)jx9_value_to_string(pArg, &length);
 			}
 			if( length < 1 ){
-				zBuf = (char*)" ";
+				zBuf = " ";
 				length = (int)sizeof(char);
 			}
 			if( precision>=0 && precision<length ){
@@ -3753,7 +3753,7 @@ JX9_PRIVATE sxi32 jx9InputFormat(
         }
         zBuf = &zWorker[JX9_FMT_BUFSIZ-1];
         {
-          register const char *cset;      /* Use registers for speed */
+          register char *cset;      /* Use registers for speed */
           register int base;
           cset = pInfo->charset;
           base = pInfo->base;
@@ -3768,8 +3768,7 @@ JX9_PRIVATE sxi32 jx9InputFormat(
         }
         if( prefix ) *(--zBuf) = (char)prefix;               /* Add sign */
         if( flag_alternateform && pInfo->prefix ){      /* Add "0" or "0x" */
-          const char *pre;
-          char x;
+          char *pre, x;
           pre = pInfo->prefix;
           if( *zBuf!=pre[0] ){
             for(pre=pInfo->prefix; (x=(*pre))!=0; pre++) *(--zBuf) = x;
@@ -3822,7 +3821,7 @@ JX9_PRIVATE sxi32 jx9InputFormat(
           while( realvalue<1e-8 && exp>=-350 ){ realvalue *= 1e8; exp-=8; }
           while( realvalue<1.0 && exp>=-350 ){ realvalue *= 10.0; exp--; }
           if( exp>350 || exp<-350 ){
-            zBuf = (char*)"NaN";
+            zBuf = "NaN";
             length = 3;
             break;
           }
